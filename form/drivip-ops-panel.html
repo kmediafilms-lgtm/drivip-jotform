@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DRIVIP OPS — Panel de Operaciones</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Poppins:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #0F1624; --navy-light: #1a2340; --navy-mid: #161e30;
+      --purple: #6B5CE7; --purple-glow: rgba(107,92,231,0.2);
+      --white: #fff; --muted: #8891a8; --border: rgba(107,92,231,0.18);
+      --card: rgba(255,255,255,0.04);
+      --green: #10b981; --yellow: #f59e0b; --red: #ef4444; --blue: #3b82f6;
+      --font-d: 'Outfit',sans-serif; --font-b: 'Poppins',sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--navy);color:var(--white);font-family:var(--font-b);min-height:100vh}
+    button{cursor:pointer;font-family:var(--font-d)}
+
+    /* Auth screen */
+    .auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+    .auth-card{background:var(--navy-mid);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:380px;text-align:center}
+    .auth-logo{font-family:var(--font-d);font-weight:800;font-size:1.5rem;letter-spacing:0.12em;margin-bottom:4px}
+    .auth-sub{color:var(--muted);font-size:.8rem;margin-bottom:28px}
+    .auth-input{width:100%;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:10px;padding:13px 16px;color:var(--white);font-family:var(--font-b);font-size:.9rem;outline:none;margin-bottom:14px}
+    .auth-input:focus{border-color:var(--purple)}
+    .auth-btn{width:100%;padding:14px;background:var(--purple);color:var(--white);font-family:var(--font-d);font-size:.95rem;font-weight:700;border:none;border-radius:100px;cursor:pointer;transition:.2s}
+    .auth-btn:hover{background:#5548c8}
+
+    /* App */
+    .app{display:none}
+    .app.visible{display:block}
+
+    /* Header */
+    .app-header{background:rgba(15,22,36,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+    .header-logo{font-family:var(--font-d);font-weight:800;font-size:1.1rem;letter-spacing:.12em}
+    .header-logo span{color:var(--purple)}
+    .header-actions{display:flex;gap:10px}
+    .btn-sm{font-family:var(--font-d);font-size:.75rem;font-weight:600;letter-spacing:.06em;padding:7px 16px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--muted);transition:.2s;cursor:pointer}
+    .btn-sm:hover{color:var(--white);border-color:var(--purple)}
+    .btn-sm.primary{background:var(--purple);border-color:var(--purple);color:var(--white)}
+    .btn-sm.primary:hover{background:#5548c8}
+
+    /* Main */
+    .main{padding:24px 28px;max-width:1200px;margin:0 auto}
+
+    /* Metrics */
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+    .metric-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px}
+    .metric-label{font-family:var(--font-d);font-size:.68rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+    .metric-value{font-family:var(--font-d);font-size:2rem;font-weight:800}
+
+    /* Table */
+    .table-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+    .table-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border)}
+    .table-title{font-family:var(--font-d);font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+    .search-input{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--white);font-family:var(--font-b);font-size:.8rem;outline:none;width:220px}
+    .search-input:focus{border-color:var(--purple)}
+    table{width:100%;border-collapse:collapse;font-size:.82rem}
+    thead tr{border-bottom:1px solid var(--border)}
+    th{text-align:left;font-family:var(--font-d);font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:12px 18px}
+    tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s;cursor:pointer}
+    tbody tr:hover{background:rgba(255,255,255,.03)}
+    td{padding:13px 18px;vertical-align:middle}
+    .td-id{font-family:var(--font-d);font-weight:700;font-size:.75rem;color:var(--purple)}
+    .td-name{font-weight:500}
+    .td-sub{font-size:.72rem;color:var(--muted);margin-top:2px}
+    .td-price{font-family:var(--font-d);font-weight:800}
+    .status-pill{display:inline-block;font-family:var(--font-d);font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:100px}
+
+    /* Drawer */
+    .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:100;opacity:0;pointer-events:none;transition:opacity .25s}
+    .drawer-overlay.open{opacity:1;pointer-events:all}
+    .drawer{position:fixed;top:0;right:0;bottom:0;width:100%;max-width:420px;background:var(--navy-mid);border-left:1px solid var(--border);z-index:101;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);overflow-y:auto;padding:24px}
+    .drawer.open{transform:translateX(0)}
+    .drawer-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;transition:.2s}
+    .drawer-close:hover{color:var(--white);border-color:var(--purple)}
+    .drawer-id{font-family:var(--font-d);font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--purple);margin-bottom:4px}
+    .drawer-title{font-family:var(--font-d);font-weight:800;font-size:1.2rem;margin-bottom:20px}
+    .detail-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.82rem}
+    .detail-label{color:var(--muted)}
+    .detail-value{font-weight:500;text-align:right;max-width:220px}
+    .drawer-section{margin:20px 0 10px;font-family:var(--font-d);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--purple)}
+    .drawer-select,.drawer-textarea{width:100%;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 14px;color:var(--white);font-family:var(--font-b);font-size:.85rem;outline:none;margin-bottom:12px;transition:.2s;appearance:none}
+    .drawer-select:focus,.drawer-textarea:focus{border-color:var(--purple)}
+    .drawer-textarea{min-height:80px;resize:vertical}
+    .drawer-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238891a8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer}
+    .drawer-select option{background:#1a2340}
+    .btn-full{width:100%;padding:13px;border:none;border-radius:100px;font-family:var(--font-d);font-size:.9rem;font-weight:700;cursor:pointer;transition:.2s;margin-bottom:10px}
+    .btn-purple{background:var(--purple);color:#fff}
+    .btn-purple:hover{background:#5548c8}
+    .btn-wa{background:#25d366;color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn-wa:hover{background:#1fba59}
+    .empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+
+    @media(max-width:900px){
+      .metrics{grid-template-columns:repeat(2,1fr)}
+      .main{padding:16px}
+      th:nth-child(3),td:nth-child(3),th:nth-child(5),td:nth-child(5){display:none}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Auth Screen -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-card">
+    <div class="auth-logo">▲ DRIVIP <span style="color:var(--purple)">OPS</span></div>
+    <div class="auth-sub">Panel de operaciones interno</div>
+    <input class="auth-input" type="password" id="authKey" placeholder="Clave de administrador" />
+    <button class="auth-btn" onclick="doAuth()">Ingresar</button>
+  </div>
+</div>
+
+<!-- App -->
+<div class="app" id="app">
+
+  <header class="app-header">
+    <div class="header-logo">▲ DRI<span>VIP</span> OPS</div>
+    <div class="header-actions">
+      <button class="btn-sm" onclick="loadBookings()">↻ Actualizar</button>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Metrics -->
+    <div class="metrics" id="metrics">
+      <div class="metric-card"><div class="metric-label">Total</div><div class="metric-value" id="m-total">—</div></div>
+      <div class="metric-card"><div class="metric-label">Pendientes</div><div class="metric-value" id="m-pending" style="color:var(--yellow)">—</div></div>
+      <div class="metric-card"><div class="metric-label">Confirmadas</div><div class="metric-value" id="m-confirmed" style="color:var(--green)">—</div></div>
+      <div class="metric-card"><div class="metric-label">Revenue</div><div class="metric-value" id="m-revenue" style="color:var(--purple)">—</div></div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <div class="table-header">
+        <span class="table-title">Reservas</span>
+        <input class="search-input" type="text" placeholder="Buscar..." id="searchInput" oninput="filterTable()" />
+      </div>
+      <div id="tableWrap">
+        <div class="empty-state">Cargando reservas...</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Drawer -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  <div id="drawerContent"></div>
+</div>
+
+<script>
+  // ⚠️ CONFIGURAR:
+  const OPS_CONFIG = {
+    BACKEND_URL:    'REEMPLAZA_CON_TU_BACKEND_URL', // Apps Script URL o drivip-web URL
+    ADMIN_WHATSAPP: '50760000000',
+    ADMIN_KEY:      '',  // Si usas drivip-web, tu WEBHOOK_SECRET
+  }
+
+  const STATUS_LABELS = { pending:'Pendiente', confirmed:'Confirmada', in_progress:'En Progreso', completed:'Completada', cancelled:'Cancelada' }
+  const STATUS_COLORS = { pending:'#F59E0B', confirmed:'#10B981', in_progress:'#6B5CE7', completed:'#3B82F6', cancelled:'#EF4444' }
+
+  let allBookings = []
+  let adminKey    = ''
+
+  function doAuth() {
+    const key = document.getElementById('authKey').value
+    if (!key) return alert('Ingresa la clave')
+    adminKey = key
+    document.getElementById('authScreen').style.display = 'none'
+    document.getElementById('app').classList.add('visible')
+    loadBookings()
+    setInterval(loadBookings, 60000)
+  }
+  document.getElementById('authKey').addEventListener('keydown', e => { if(e.key==='Enter') doAuth() })
+
+  async function loadBookings() {
+    try {
+      // Try drivip-web first, fallback to Apps Script
+      let url = `${OPS_CONFIG.BACKEND_URL}/api/bookings`
+      let headers = { 'x-admin-key': adminKey }
+
+      // If Apps Script URL, use query params
+      if (OPS_CONFIG.BACKEND_URL.includes('script.google.com')) {
+        url = `${OPS_CONFIG.BACKEND_URL}?action=getAll`
+        headers = {}
+      }
+
+      const res  = await fetch(url, { headers })
+      const data = await res.json()
+
+      if (data.success) {
+        allBookings = data.data?.bookings || []
+        renderTable(allBookings)
+        updateMetrics(allBookings)
+      } else {
+        showDemoData()
+      }
+    } catch {
+      showDemoData()
+    }
+  }
+
+  function showDemoData() {
+    allBookings = getDemoData()
+    renderTable(allBookings)
+    updateMetrics(allBookings)
+  }
+
+  function updateMetrics(bookings) {
+    document.getElementById('m-total').textContent     = bookings.length
+    document.getElementById('m-pending').textContent   = bookings.filter(b=>b.status==='pending').length
+    document.getElementById('m-confirmed').textContent = bookings.filter(b=>b.status==='confirmed').length
+    const revenue = bookings.filter(b=>b.status!=='cancelled').reduce((s,b)=>s+(parseFloat(b.total_price)||0),0)
+    document.getElementById('m-revenue').textContent = '$' + revenue.toLocaleString()
+  }
+
+  function renderTable(bookings) {
+    const wrap = document.getElementById('tableWrap')
+    if (!bookings.length) {
+      wrap.innerHTML = '<div class="empty-state">No hay reservas aún.</div>'
+      return
+    }
+    wrap.innerHTML = `
+      <table>
+        <thead><tr>
+          <th>ID</th><th>Cliente</th><th>Ruta</th><th>Fecha</th><th>Total</th><th>Estado</th><th></th>
+        </tr></thead>
+        <tbody>
+          ${bookings.map(b => `
+            <tr onclick="openDrawer('${b.booking_id || b.id}')">
+              <td><div class="td-id">${b.booking_id || b.id || '—'}</div></td>
+              <td>
+                <div class="td-name">${esc(b.client_name || b.clientName || '')}</div>
+                <div class="td-sub">${esc(b.email || b.clientEmail || '')}</div>
+              </td>
+              <td><div style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:.78rem">${esc(b.route || (b.route?.label) || '')}</div></td>
+              <td style="color:var(--muted);font-size:.78rem;white-space:nowrap">${b.service_date || b.serviceDate || ''} ${b.service_time || b.serviceTime || ''}</td>
+              <td><span class="td-price" style="color:var(--purple)">$${b.total_price || b.totalPrice || 0}</span></td>
+              <td>
+                <span class="status-pill" style="background:${(STATUS_COLORS[b.status]||'#888')}22;color:${STATUS_COLORS[b.status]||'#888'}">
+                  ${STATUS_LABELS[b.status] || b.status || 'pending'}
+                </span>
+              </td>
+              <td style="color:var(--purple);font-family:var(--font-d);font-size:.8rem;font-weight:600">Ver →</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`
+  }
+
+  function filterTable() {
+    const q = document.getElementById('searchInput').value.toLowerCase()
+    const filtered = allBookings.filter(b =>
+      (b.booking_id||b.id||'').toLowerCase().includes(q) ||
+      (b.client_name||b.clientName||'').toLowerCase().includes(q) ||
+      (b.email||b.clientEmail||'').toLowerCase().includes(q)
+    )
+    renderTable(filtered)
+  }
+
+  function openDrawer(id) {
+    const b = allBookings.find(x => (x.booking_id||x.id) === id)
+    if (!b) return
+    const bid = b.booking_id || b.id
+
+    document.getElementById('drawerContent').innerHTML = `
+      <div class="drawer-id">Reserva</div>
+      <div class="drawer-title">${bid}</div>
+
+      ${[
+        ['Cliente', esc(b.client_name||b.clientName||'')],
+        ['WhatsApp', '+' + (b.whatsapp||b.clientWhatsApp||'')],
+        ['Email', esc(b.email||b.clientEmail||'')],
+        ['Ruta', esc(b.route||(b.route?.label)||'')],
+        ['Fecha', `${b.service_date||b.serviceDate||''} ${b.service_time||b.serviceTime||''}`],
+        ['Pasajeros', b.passengers||1],
+        ['Equipaje', b.luggage||'—'],
+        ['Total', '$' + (b.total_price||b.totalPrice||0)],
+        ['Pago', (b.payment_method||b.paymentMethod)==='pay_now' ? 'Pago inmediato' : 'Pago al llegar'],
+      ].map(([l,v])=>`
+        <div class="detail-row">
+          <span class="detail-label">${l}</span>
+          <span class="detail-value">${v}</span>
+        </div>`).join('')}
+
+      <div class="drawer-section">Actualizar estado</div>
+      <select class="drawer-select" id="drawerStatus">
+        ${Object.entries(STATUS_LABELS).map(([v,l])=>
+          `<option value="${v}" ${b.status===v?'selected':''}>${l}</option>`
+        ).join('')}
+      </select>
+
+      <div class="drawer-section">Notas internas</div>
+      <textarea class="drawer-textarea" id="drawerNotes" placeholder="Notas del operador...">${esc(b.admin_notes||b.adminNotes||'')}</textarea>
+
+      <button class="btn-full btn-purple" onclick="saveBooking('${bid}')">Guardar cambios</button>
+      <a class="btn-full btn-wa"
+         href="https://wa.me/${(b.whatsapp||b.clientWhatsApp||'')}?text=${encodeURIComponent('Hola ' + (b.client_name||b.clientName||'') + ', soy de DRIVIP. Tu reserva ' + bid + ' está lista 🚗')}"
+         target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp cliente
+      </a>`
+
+    document.getElementById('drawerOverlay').classList.add('open')
+    document.getElementById('drawer').classList.add('open')
+  }
+
+  async function saveBooking(id) {
+    const status = document.getElementById('drawerStatus').value
+    const notes  = document.getElementById('drawerNotes').value
+
+    try {
+      let success = false
+
+      if (OPS_CONFIG.BACKEND_URL.includes('script.google.com')) {
+        // Apps Script
+        const res  = await fetch(OPS_CONFIG.BACKEND_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action:'updateStatus', bookingId:id, status, adminNotes:notes }),
+        })
+        const data = await res.json()
+        success = data.success
+      } else {
+        // drivip-web
+        const res = await fetch(`${OPS_CONFIG.BACKEND_URL}/api/bookings/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type':'application/json', 'x-admin-key': adminKey },
+          body: JSON.stringify({ status, adminNotes: notes }),
+        })
+        const data = await res.json()
+        success = data.success
+      }
+
+      if (success) {
+        allBookings = allBookings.map(b => (b.booking_id||b.id)===id ? {...b, status, admin_notes:notes} : b)
+        renderTable(allBookings)
+        updateMetrics(allBookings)
+        closeDrawer()
+      }
+    } catch(err) {
+      console.error(err)
+      alert('Error al guardar. Intenta de nuevo.')
+    }
+  }
+
+  function closeDrawer() {
+    document.getElementById('drawerOverlay').classList.remove('open')
+    document.getElementById('drawer').classList.remove('open')
+  }
+
+  function esc(s) { return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+  function getDemoData() {
+    return [
+      { booking_id:'DRV-20260324-001', client_name:'Juan Pérez', email:'juan@email.com', whatsapp:'50760000001', route:'Tocumen Airport → Panama City', service_date:'2026-03-25', service_time:'08:00', passengers:2, luggage:'medium', total_price:30, payment_method:'pay_later', status:'confirmed', admin_notes:'' },
+      { booking_id:'DRV-20260324-002', client_name:'María López', email:'maria@email.com', whatsapp:'50760000002', route:'Panama City → Playa Blanca', service_date:'2026-03-26', service_time:'09:00', passengers:4, luggage:'large', total_price:110, payment_method:'pay_later', status:'pending', admin_notes:'' },
+      { booking_id:'DRV-20260324-003', client_name:'Carlos Ruiz', email:'carlos@email.com', whatsapp:'50760000003', route:'Panama City → Coronado', service_date:'2026-03-27', service_time:'07:00', passengers:3, luggage:'medium', total_price:90, payment_method:'pay_now', status:'pending', admin_notes:'' },
+    ]
+  }
+</script>
+</body>
+</html>

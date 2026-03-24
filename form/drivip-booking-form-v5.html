@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DRIVIP — Reserva tu servicio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ─────────────────────────────────────
+       DRIVIP BOOKING FORM v5
+       Brand: Navy #0F1624 · Purple #6B5CE7
+       Fonts: Outfit · Poppins
+    ───────────────────────────────────── */
+    :root {
+      --navy:        #0F1624;
+      --navy-light:  #1a2340;
+      --navy-mid:    #161e30;
+      --purple:      #6B5CE7;
+      --purple-dim:  #5548c8;
+      --purple-glow: rgba(107,92,231,0.2);
+      --white:       #ffffff;
+      --muted:       #8891a8;
+      --border:      rgba(107,92,231,0.18);
+      --card:        rgba(255,255,255,0.04);
+      --error:       #ef4444;
+      --success:     #10b981;
+      --radius:      16px;
+      --font-display:'Outfit', sans-serif;
+      --font-body:   'Poppins', sans-serif;
+      --transition:  0.22s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      padding: 0 0 60px;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      background: rgba(15,22,36,0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-mark { color: var(--purple); font-size: 1.3rem; }
+    .logo-text { font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; letter-spacing: 0.12em; }
+    .header-badge {
+      font-family: var(--font-display); font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.15em; text-transform: uppercase; color: var(--purple);
+      border: 1px solid var(--border); padding: 4px 12px; border-radius: 100px;
+    }
+
+    /* ── Hero strip ── */
+    .hero-strip {
+      background: linear-gradient(135deg, var(--navy-mid), #1a1040);
+      border-bottom: 1px solid var(--border);
+      padding: 48px 24px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-strip::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(107,92,231,0.05) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(107,92,231,0.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-display); font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted);
+      margin-bottom: 16px; position: relative;
+    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple); animation: pulse 2s ease infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 var(--purple-glow)} 50%{opacity:.7;box-shadow:0 0 0 8px transparent} }
+    .hero-title {
+      font-family: var(--font-display); font-size: clamp(1.8rem,5vw,3rem);
+      font-weight: 800; letter-spacing: -0.02em; margin-bottom: 10px; position: relative;
+    }
+    .hero-title span { color: var(--purple); }
+    .hero-sub { font-size: 0.9rem; color: var(--muted); position: relative; }
+    .hero-slogan {
+      font-family: var(--font-display); font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--purple);
+      margin-top: 12px; position: relative;
+    }
+
+    /* ── Form container ── */
+    .form-wrap {
+      max-width: 580px;
+      margin: 40px auto 0;
+      padding: 0 20px;
+    }
+
+    /* ── Section card ── */
+    .section-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 20px;
+      transition: border-color var(--transition);
+    }
+    .section-card:focus-within { border-color: rgba(107,92,231,0.45); }
+    .section-title {
+      font-family: var(--font-display); font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--purple);
+      margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+    }
+    .section-title::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* ── Fields ── */
+    .field { margin-bottom: 16px; }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block; font-family: var(--font-display); font-size: 0.78rem;
+      font-weight: 600; color: var(--muted); margin-bottom: 7px; letter-spacing: 0.04em;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 13px 16px;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      appearance: none;
+    }
+    input::placeholder, textarea::placeholder { color: var(--muted); }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px rgba(107,92,231,0.15);
+    }
+    input.error, select.error { border-color: var(--error); }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238891a8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      padding-right: 40px;
+      cursor: pointer;
+    }
+    select option { background: #1a2340; color: var(--white); }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* ── Price display ── */
+    .price-display {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(107,92,231,0.1);
+      border: 1px solid rgba(107,92,231,0.25);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-top: 14px;
+      transition: all var(--transition);
+    }
+    .price-display.hidden { display: none; }
+    .price-label { font-family: var(--font-display); font-size: 0.8rem; color: var(--muted); }
+    .price-value { font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; color: var(--white); }
+    .price-duration { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Payment options ── */
+    .payment-options { display: flex; flex-direction: column; gap: 10px; }
+    .payment-option {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .payment-option:hover { border-color: var(--purple); }
+    .payment-option.selected {
+      border-color: var(--purple);
+      background: rgba(107,92,231,0.12);
+    }
+    .payment-option input[type="radio"] { display: none; }
+    .payment-icon { font-size: 1.3rem; line-height: 1; }
+    .payment-text { flex: 1; }
+    .payment-name { font-family: var(--font-display); font-size: 0.88rem; font-weight: 600; }
+    .payment-desc { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    .payment-check {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid var(--muted); transition: all var(--transition);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .payment-option.selected .payment-check {
+      border-color: var(--purple); background: var(--purple);
+    }
+    .payment-option.selected .payment-check::after {
+      content: ''; width: 6px; height: 6px; border-radius: 50%; background: white;
+    }
+
+    /* ── Terms ── */
+    .terms-row {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 16px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .terms-row input[type="checkbox"] {
+      width: 18px; height: 18px; min-width: 18px;
+      accent-color: var(--purple); cursor: pointer; margin-top: 2px;
+    }
+    .terms-text { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── Error message ── */
+    .error-msg {
+      display: none;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 10px;
+      padding: 14px 18px;
+      color: #f87171;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+    }
+    .error-msg.show { display: block; }
+
+    /* ── Submit ── */
+    .btn-submit {
+      width: 100%;
+      padding: 17px;
+      background: var(--purple);
+      color: var(--white);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all var(--transition);
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      box-shadow: 0 0 40px var(--purple-glow);
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: var(--purple-dim);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 40px rgba(107,92,231,0.45);
+    }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.7s linear infinite; display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-submit.loading .spinner { display: block; }
+    .btn-submit.loading .btn-text { opacity: 0.7; }
+
+    /* ── Success state ── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+      animation: fadeUp 0.5s ease both;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .success-screen.show { display: block; }
+    .success-icon {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; margin: 0 auto 24px;
+    }
+    .success-id {
+      display: inline-block;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 20px;
+      font-family: var(--font-display); font-weight: 700; font-size: 1.1rem;
+      color: var(--purple); margin: 16px 0 8px;
+    }
+    .success-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; margin-bottom: 12px; }
+    .success-desc { color: var(--muted); font-size: 0.88rem; line-height: 1.7; max-width: 360px; margin: 0 auto 32px; }
+    .btn-wa {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: #25d366; color: white;
+      font-family: var(--font-display); font-size: 0.95rem; font-weight: 700;
+      padding: 15px 32px; border-radius: 100px; text-decoration: none;
+      transition: all var(--transition);
+    }
+    .btn-wa:hover { background: #1fba59; transform: translateY(-2px); }
+    .btn-reset {
+      display: block; margin: 16px auto 0; background: none; border: none;
+      color: var(--muted); font-family: var(--font-display); font-size: 0.85rem;
+      cursor: pointer; text-decoration: underline; transition: color var(--transition);
+    }
+    .btn-reset:hover { color: var(--white); }
+
+    /* ── Hint text ── */
+    .hint { font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .site-header { padding: 16px 20px; }
+      .field-row { grid-template-columns: 1fr; }
+      .section-card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="logo">
+      <span class="logo-mark">▲</span>
+      <span class="logo-text">DRIVIP</span>
+    </div>
+    <span class="header-badge">Reservas</span>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero-strip">
+    <div class="hero-eyebrow"><span class="dot"></span>Servicio Ejecutivo · Panamá</div>
+    <h1 class="hero-title">Reserva tu <span>traslado</span></h1>
+    <p class="hero-sub">Confirmación inmediata · Mínimo 6 horas de anticipación</p>
+    <p class="hero-slogan">Confirmado antes de salir.</p>
+  </div>
+
+  <!-- Main form wrap -->
+  <div class="form-wrap" id="formWrap">
+
+    <!-- Error global -->
+    <div class="error-msg" id="globalError"></div>
+
+    <form id="bookingForm" novalidate>
+
+      <!-- ── 1. Datos del cliente ── -->
+      <div class="section-card">
+        <div class="section-title">Información de contacto</div>
+
+        <div class="field">
+          <label for="clientName">Nombre completo *</label>
+          <input type="text" id="clientName" name="clientName" placeholder="Tu nombre completo" autocomplete="name" required />
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="clientWhatsApp">WhatsApp *</label>
+            <input type="tel" id="clientWhatsApp" name="clientWhatsApp" placeholder="50760000000" required />
+            <p class="hint">Sin símbolo +, incluye código de país</p>
+          </div>
+          <div class="field">
+            <label for="clientEmail">Email *</label>
+            <input type="email" id="clientEmail" name="clientEmail" placeholder="tu@email.com" autocomplete="email" required />
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 2. Ruta y precio ── -->
+      <div class="section-card">
+        <div class="section-title">Selecciona tu ruta</div>
+
+        <div class="field">
+          <label for="routeId">Ruta *</label>
+          <select id="routeId" name="routeId" required onchange="onRouteChange(this)">
+            <option value="">-- Selecciona una ruta --</option>
+            <option value="tocumen-to-city"    data-price="30"  data-duration="45 min"    data-type="airport_to_city">Tocumen Airport → Panama City — $30</option>
+            <option value="city-to-tocumen"    data-price="30"  data-duration="45 min"    data-type="city_to_airport">Panama City → Tocumen Airport — $30</option>
+            <option value="city-to-playa-blanca" data-price="110" data-duration="2h 30min" data-type="custom_transfer">Panama City → Playa Blanca — $110</option>
+            <option value="city-to-colon"      data-price="75"  data-duration="1h 15min"  data-type="custom_transfer">Panama City → Colón — $75</option>
+            <option value="city-to-veracruz"   data-price="25"  data-duration="30 min"    data-type="custom_transfer">Panama City → Veracruz — $25</option>
+            <option value="city-to-coronado"   data-price="90"  data-duration="1h 30min"  data-type="custom_transfer">Panama City → Coronado — $90</option>
+          </select>
+        </div>
+
+        <!-- Price display — shown only when route selected -->
+        <div class="price-display hidden" id="priceDisplay">
+          <div>
+            <div class="price-label">Precio del servicio</div>
+            <div class="price-duration" id="priceDuration"></div>
+          </div>
+          <div class="price-value" id="priceValue">$0</div>
+        </div>
+      </div>
+
+      <!-- ── 3. Fecha y hora ── -->
+      <div class="section-card">
+        <div class="section-title">Fecha y hora</div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="serviceDate">Fecha *</label>
+            <input type="date" id="serviceDate" name="serviceDate" required />
+          </div>
+          <div class="field">
+            <label for="serviceTime">Hora *</label>
+            <input type="time" id="serviceTime" name="serviceTime" required />
+          </div>
+        </div>
+        <p class="hint">⚠️ Mínimo 6 horas de anticipación. Solicitudes urgentes requieren confirmación manual.</p>
+      </div>
+
+      <!-- ── 4. Pasajeros y equipaje ── -->
+      <div class="section-card">
+        <div class="section-title">Pasajeros y equipaje</div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="passengers">Pasajeros *</label>
+            <select id="passengers" name="passengers">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="luggage">Equipaje *</label>
+            <select id="luggage" name="luggage">
+              <option value="light">Ligero</option>
+              <option value="medium">Mediano</option>
+              <option value="large">Grande / Maletas</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 5. Método de pago ── -->
+      <div class="section-card">
+        <div class="section-title">Método de pago</div>
+
+        <div class="payment-options">
+          <label class="payment-option selected" id="opt-pay-later">
+            <input type="radio" name="paymentMethod" value="pay_later" checked onchange="selectPayment(this)" />
+            <span class="payment-icon">💵</span>
+            <div class="payment-text">
+              <div class="payment-name">Pagar al llegar</div>
+              <div class="payment-desc">Efectivo o transferencia al momento del servicio</div>
+            </div>
+            <div class="payment-check"></div>
+          </label>
+
+          <label class="payment-option" id="opt-pay-now">
+            <input type="radio" name="paymentMethod" value="pay_now" onchange="selectPayment(this)" />
+            <span class="payment-icon">💳</span>
+            <div class="payment-text">
+              <div class="payment-name">Pagar ahora</div>
+              <div class="payment-desc">Pago online seguro — se procesará al confirmar</div>
+            </div>
+            <div class="payment-check"></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- ── 6. Términos ── -->
+      <div class="section-card">
+        <label class="terms-row">
+          <input type="checkbox" id="termsAccepted" name="termsAccepted" required />
+          <span class="terms-text">
+            Entiendo que este es un servicio ejecutivo privado y mi solicitud será confirmada según disponibilidad. Acepto ser contactado por DRIVIP para coordinar el servicio.
+          </span>
+        </label>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <div class="spinner" id="spinner"></div>
+        <span class="btn-text">Confirmar reserva →</span>
+      </button>
+
+    </form>
+
+    <!-- Success screen -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">✦</div>
+      <div class="success-id" id="successId">DRV-...</div>
+      <h2 class="success-title">¡Solicitud recibida!</h2>
+      <p class="success-desc">
+        Tu reserva fue enviada correctamente. Nuestro equipo te contactará por WhatsApp en breve para confirmar tu servicio.
+      </p>
+      <p style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--purple);margin-bottom:28px;">
+        Confirmado antes de salir.
+      </p>
+      <a href="#" class="btn-wa" id="waLink">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contactar por WhatsApp
+      </a>
+      <button class="btn-reset" onclick="resetForm()">Hacer otra reserva</button>
+    </div>
+
+  </div><!-- /form-wrap -->
+
+  <script>
+    // ─────────────────────────────────────────────
+    //  DRIVIP Booking Form v5
+    //  Conectado a: drivip-web API
+    // ─────────────────────────────────────────────
+
+    // ⚠️ CONFIGURAR ANTES DE USAR:
+    const CONFIG = {
+      BACKEND_URL:    'REEMPLAZA_CON_TU_URL_DE_DRIVIP_WEB', // ej: https://drivip-web.vercel.app
+      ADMIN_WHATSAPP: '50760000000',                         // número sin +
+    }
+
+    const ENDPOINT = `${CONFIG.BACKEND_URL}/api/bookings`
+
+    // ── Set min date (today) ──
+    document.addEventListener('DOMContentLoaded', () => {
+      const dateInput = document.getElementById('serviceDate')
+      const today = new Date().toISOString().split('T')[0]
+      dateInput.setAttribute('min', today)
+    })
+
+    // ── Route change → show price ──
+    function onRouteChange(select) {
+      const opt = select.options[select.selectedIndex]
+      const price = opt.dataset.price
+      const duration = opt.dataset.duration
+
+      const display = document.getElementById('priceDisplay')
+      const priceVal = document.getElementById('priceValue')
+      const priceDur = document.getElementById('priceDuration')
+
+      if (price) {
+        priceVal.textContent = `$${price}`
+        priceDur.textContent = `⏱ ${duration}`
+        display.classList.remove('hidden')
+      } else {
+        display.classList.add('hidden')
+      }
+    }
+
+    // ── Payment option select ──
+    function selectPayment(radio) {
+      document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'))
+      radio.closest('.payment-option').classList.add('selected')
+    }
+
+    // ── Form submit ──
+    document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+      e.preventDefault()
+      if (!validateForm()) return
+
+      setLoading(true)
+      clearError()
+
+      const payload = {
+        clientName:     document.getElementById('clientName').value.trim(),
+        clientWhatsApp: document.getElementById('clientWhatsApp').value.trim(),
+        clientEmail:    document.getElementById('clientEmail').value.trim().toLowerCase(),
+        serviceType:    getSelectedRouteData('type'),
+        routeId:        document.getElementById('routeId').value,
+        serviceDate:    document.getElementById('serviceDate').value,
+        serviceTime:    document.getElementById('serviceTime').value,
+        passengers:     parseInt(document.getElementById('passengers').value),
+        luggage:        document.getElementById('luggage').value,
+        paymentMethod:  document.querySelector('input[name="paymentMethod"]:checked').value,
+        termsAccepted:  true,
+      }
+
+      try {
+        const res = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+
+        const data = await res.json()
+
+        if (!res.ok || !data.success) {
+          showError(data.message || data.error || 'Error al procesar la reserva. Por favor intenta de nuevo.')
+          return
+        }
+
+        showSuccess(data.data.bookingId, payload.clientName, payload.clientWhatsApp)
+
+      } catch (err) {
+        showError('Error de conexión. Por favor verifica tu internet e intenta de nuevo.')
+        console.error('[DRIVIP Form]', err)
+      } finally {
+        setLoading(false)
+      }
+    })
+
+    // ── Validation ──
+    function validateForm() {
+      let valid = true
+      clearFieldErrors()
+
+      const fields = [
+        { id: 'clientName',    msg: 'El nombre es requerido', check: v => v.trim().length >= 2 },
+        { id: 'clientWhatsApp',msg: 'WhatsApp inválido (solo números, 7-15 dígitos)', check: v => /^\d{7,15}$/.test(v.trim()) },
+        { id: 'clientEmail',   msg: 'Email inválido', check: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) },
+        { id: 'routeId',       msg: 'Selecciona una ruta', check: v => v !== '' },
+        { id: 'serviceDate',   msg: 'Selecciona una fecha', check: v => v !== '' },
+        { id: 'serviceTime',   msg: 'Selecciona una hora', check: v => v !== '' },
+      ]
+
+      fields.forEach(({ id, msg, check }) => {
+        const el = document.getElementById(id)
+        if (!check(el.value)) {
+          el.classList.add('error')
+          valid = false
+          if (valid === false && !document.querySelector('.error-msg.show')) {
+            showError(msg)
+          }
+        }
+      })
+
+      if (!document.getElementById('termsAccepted').checked) {
+        showError('Debes aceptar los términos y condiciones.')
+        valid = false
+      }
+
+      return valid
+    }
+
+    function clearFieldErrors() {
+      document.querySelectorAll('.error').forEach(el => el.classList.remove('error'))
+    }
+
+    // ── Helpers ──
+    function getSelectedRouteData(attr) {
+      const sel = document.getElementById('routeId')
+      const opt = sel.options[sel.selectedIndex]
+      return opt.dataset[attr] || ''
+    }
+
+    function setLoading(on) {
+      const btn = document.getElementById('submitBtn')
+      btn.disabled = on
+      btn.classList.toggle('loading', on)
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('globalError')
+      el.textContent = msg
+      el.classList.add('show')
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
+    function clearError() {
+      document.getElementById('globalError').classList.remove('show')
+    }
+
+    function showSuccess(bookingId, name, whatsapp) {
+      document.getElementById('bookingForm').style.display = 'none'
+      document.getElementById('globalError').classList.remove('show')
+
+      const screen = document.getElementById('successScreen')
+      document.getElementById('successId').textContent = bookingId
+
+      const msg = encodeURIComponent(
+        `Hola DRIVIP, soy ${name}. Mi booking es ${bookingId}. Quedo en espera de confirmación 🚗`
+      )
+      document.getElementById('waLink').href = `https://wa.me/${CONFIG.ADMIN_WHATSAPP}?text=${msg}`
+
+      screen.classList.add('show')
+      screen.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
+    function resetForm() {
+      document.getElementById('bookingForm').reset()
+      document.getElementById('bookingForm').style.display = 'block'
+      document.getElementById('successScreen').classList.remove('show')
+      document.getElementById('priceDisplay').classList.add('hidden')
+      clearFieldErrors()
+      clearError()
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  </script>
+</body>
+</html>
